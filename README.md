@@ -53,13 +53,11 @@
 - 测试程序是否正常运行：可以先把定的时间放在最近的一个时间（比如下一分钟）看下到时间是否可以正常打卡
 
 
-
 ## Thanks
 
 感谢贡献者
 
 <a href="https://github.com/conv1d"><img src="https://avatars2.githubusercontent.com/u/24759956" width="100px" height="100px"></a>
-
 
 
 ## LICENSE
