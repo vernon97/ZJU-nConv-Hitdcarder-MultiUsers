@@ -2,8 +2,6 @@
 import requests, json, re
 import time, datetime, os, sys
 import getpass
-from selenium import webdriver
-# from selenium.webdriver.chrome.options import Options
 from halo import Halo
 from apscheduler.schedulers.blocking import BlockingScheduler
 
@@ -11,39 +9,32 @@ class DaKa(object):
     def __init__(self, username, password):
         self.username = username
         self.password = password
-        # chrome_options = Options()
-        # chrome_options.add_argument('--headless')
-        # self.driver = webdriver.Chrome('./chromedriver', chrome_options=chrome_options)
-        self.driver = self._set_driver()
+        self.login_url = "https://zjuam.zju.edu.cn/cas/login?service=https%3A%2F%2Fhealthreport.zju.edu.cn%2Fa_zju%2Fapi%2Fsso%2Findex%3Fredirect%3Dhttps%253A%252F%252Fhealthreport.zju.edu.cn%252Fncov%252Fwap%252Fdefault%252Findex"
         self.base_url = "https://healthreport.zju.edu.cn/ncov/wap/default/index"
         self.save_url = "https://healthreport.zju.edu.cn/ncov/wap/default/save"
         self.sess = requests.Session()
-    
+
     def login(self):
         """Login to ZJU platform"""
-        driver = self.driver
-        driver.get("https://zjuam.zju.edu.cn/cas/login?service=https%3A%2F%2Fhealthreport.zju.edu.cn%2Fa_zju%2Fapi%2Fsso%2Findex%3Fredirect%3Dhttps%253A%252F%252Fhealthreport.zju.edu.cn%252Fncov%252Fwap%252Fdefault%252Findex")
-        driver.find_element_by_id("username").send_keys(self.username)
-        driver.find_element_by_id("password").send_keys(self.password)
-        driver.find_element_by_id("dl").click()
-        self.cookies = driver.get_cookies()
-        cookie = [item["name"] + "=" + item["value"] for item in self.cookies ]
-        self.cookiestr = '; '.join(item for item in cookie)
-        driver.close()
-        return self.cookiestr
+        res = self.sess.get(self.login_url)
+        execution = re.search('name="execution" value="(.*?)"', res.text).group(1)
+        res = self.sess.get(url='https://zjuam.zju.edu.cn/cas/v2/getPubKey').json()
+        n, e = res['modulus'], res['exponent']
+        encrypt_password = self._rsa_encrypt(password, e, n)
+
+        data = {
+            'username': username,
+            'password': encrypt_password,
+            'execution': execution,
+            '_eventId': 'submit'
+        }
+        res = self.sess.post(url=self.login_url, data=data)
+        return self.sess
     
     def post(self):
         """Post the hitcard info"""
-        self.update_sess()
         res = self.sess.post(self.save_url, data=self.info)
         return json.loads(res.text)
-    
-    def update_sess(self):
-        """Update session with new cookie"""
-        self.sess.headers.update({
-            'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/79.0.3945.130 Safari/537.36',
-            'Cookie': self.cookiestr,
-        })
     
     def get_date(self):
         today = datetime.date.today()
@@ -52,7 +43,6 @@ class DaKa(object):
     def get_info(self, html=None):
         """Get hitcard info, which is the old info with updated new time."""
         if not html:
-            self.update_sess()
             res = self.sess.get(self.base_url)
             html = res.content.decode()
         
@@ -68,22 +58,21 @@ class DaKa(object):
         self.info = new_info
         return new_info
 
-    def _set_driver(self):
-        """Set driver according to the os system"""
-        if sys.platform == "win32":
-            phantomjs_path = "./phantomjs.exe"
-        elif sys.platform == "darwin":
-            phantomjs_path = "./phantomjs-mac"
-        else:
-            phantomjs_path = "./phantomjs-linux"
-        return webdriver.PhantomJS(phantomjs_path)
+    def _rsa_encrypt(self, password_str, e_str, M_str):
+        password_bytes = bytes(password_str, 'ascii') 
+        password_int = int.from_bytes(password_bytes, 'big')
+        e_int = int(e_str, 16) 
+        M_int = int(M_str, 16) 
+        result_int = pow(password_int, e_int, M_int) 
+        return hex(result_int)[2:].rjust(128, '0')
 
 def main(username, password):
-    print("\n🚌 打卡任务启动")
+    print("\n[Time] %s" %datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
+    print("🚌 打卡任务启动")
     spinner = Halo(text='Loading', spinner='dots')
-    spinner.start('启动phantomJS浏览器...')
+    spinner.start('正在新建打卡实例...')
     dk = DaKa(username, password)
-    spinner.succeed('已启动phantomJS浏览器')
+    spinner.succeed('已新建打卡实例')
 
     spinner.start(text='登录到浙大统一身份认证平台...')
     dk.login()
@@ -118,6 +107,7 @@ if __name__=="__main__":
     # Schedule task
     scheduler = BlockingScheduler()
     scheduler.add_job(main, 'cron', args=[username, password], hour=hour, minute=minute)
+    print('⏰ 已启动定时程序，每天 %02d:%02d 为您打卡' %(int(hour), int(minute)))
     print('Press Ctrl+{0} to exit'.format('Break' if os.name == 'nt' else 'C'))
 
     try:
