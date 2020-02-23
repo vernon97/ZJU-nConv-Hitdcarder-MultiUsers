@@ -51,6 +51,7 @@
 
 - 为了防止电脑休眠或关机时程序不运行，推荐把这个部署到VPS上
 - 测试程序是否正常运行：可以先把定的时间放在最近的一个时间（比如下一分钟）看下到时间是否可以正常打卡
+- 想指定自己打卡地理位置的童鞋可以参考[8#issue](https://github.com/Tishacy/ZJU-nCov-Hitcarder/issues/8#issue-565719250)
 
 
 ## Thanks
