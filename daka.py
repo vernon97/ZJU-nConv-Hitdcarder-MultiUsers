@@ -60,6 +60,7 @@ class DaKa(object):
         new_info['jrdqjcqk[]'] = 0
         new_info['sfsqhzjkk'] = 1   # 是否申领杭州健康码
         new_info['sqhzjkkys'] = 1   # 杭州健康吗颜色，1:绿色 2:红色 3:黄色
+        new_info['sfqrxxss'] = 1    # 是否确认信息属实
         self.info = new_info
         return new_info
 
