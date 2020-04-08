@@ -47,10 +47,12 @@ class DaKa(object):
             html = res.content.decode()
         
         old_info = json.loads(re.findall(r'oldInfo: ({[^}]+})', html)[0])
+        new_id = re.findall(r'def = {"id":"([^\"]+)",', html)[0]
         name = re.findall(r'realname: "([^\"]+)",', html)[0]
         number = re.findall(r"number: '([^\']+)',", html)[0]
 
         new_info = old_info.copy()
+        new_info['id'] = new_id
         new_info['name'] = name
         new_info['number'] = number
         new_info["date"] = self.get_date()
@@ -61,6 +63,9 @@ class DaKa(object):
         new_info['sfsqhzjkk'] = 1   # 是否申领杭州健康码
         new_info['sqhzjkkys'] = 1   # 杭州健康吗颜色，1:绿色 2:红色 3:黄色
         new_info['sfqrxxss'] = 1    # 是否确认信息属实
+        new_info['jcqzrq'] = ""
+        new_info['gwszdd'] = ""
+        new_info['szgjcs'] = ""
         self.info = new_info
         return new_info
 
