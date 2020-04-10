@@ -47,7 +47,7 @@ class DaKa(object):
             html = res.content.decode()
         
         old_info = json.loads(re.findall(r'oldInfo: ({[^}]+})', html)[0])
-        new_id = re.findall(r'def = {"id":"([^\"]+)",', html)[0]
+        new_id = re.findall(r'"id":([^,\"]+),', html)[0]
         name = re.findall(r'realname: "([^\"]+)",', html)[0]
         number = re.findall(r"number: '([^\']+)',", html)[0]
 
