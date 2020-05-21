@@ -1,7 +1,9 @@
 # ZJU-nCov-Hitcarder-MultiUsers
 
 修改自https://github.com/Tishacy/ZJU-nCov-Hitcarder, 实验室集体打卡用(逃
+
 只需要新建 users.json文件, 保存所有打卡人的浙大通行证账号密码即可;
+
 users.json文件格式↓
 ```
 {
@@ -10,7 +12,9 @@ users.json文件格式↓
     "217******":"password333"
 }
 ```
+
 然后`python daka.py`开起来即可 依赖安装可以按照原作者的教程
+
 ---------------------------分割线--------------------------------
 
 浙大nCov肺炎健康打卡定时自动脚本
