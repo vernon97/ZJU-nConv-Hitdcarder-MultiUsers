@@ -161,7 +161,7 @@ def multiUserDaKka(user_list):
         time.sleep(10)
 
 if __name__=="__main__":
-    with open("/home/vernon/Applications/ZJU-nCov-Hitcarder/users.json", 'r') as f:
+    with open("./users.json", 'r') as f:
         users = json.load(f)
 
     # if os.path.exists('./config.json'):
