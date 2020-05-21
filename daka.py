@@ -4,7 +4,8 @@ import time, datetime, os, sys
 import getpass
 from halo import Halo
 from apscheduler.schedulers.blocking import BlockingScheduler
-
+import time
+import json
 class DaKa(object):
     """Hit card class
 
@@ -154,24 +155,32 @@ def main(username, password):
         spinner.fail('数据提交失败')
         return 
 
+def multiUserDaKka(user_list):
+    for username, password in user_list:
+        main(username, password)
+        time.sleep(10)
 
 if __name__=="__main__":
-    if os.path.exists('./config.json'):
-        configs = json.loads(open('./config.json', 'r').read())
-        username = configs["username"]
-        password = configs["password"]
-        hour = configs["schedule"]["hour"]
-        minute = configs["schedule"]["minute"]
-    else:
-        username = input("👤 浙大统一认证用户名: ")
-        password = getpass.getpass('🔑 浙大统一认证密码: ')
-        print("⏲  请输入定时时间（默认每天6:05）")
-        hour = input("\thour: ") or 6
-        minute = input("\tminute: ") or 5
+    with open("/home/vernon/Applications/ZJU-nCov-Hitcarder/users.json", 'r') as f:
+        users = json.load(f)
 
-    # Schedule task
+    # if os.path.exists('./config.json'):
+    #     configs = json.loads(open('./config.json', 'r').read())
+    #     username = configs["username"]
+    #     password = configs["password"]
+    #     hour = configs["schedule"]["hour"]
+    #     minute = configs["schedule"]["minute"]
+    # else:
+    #     username = input("👤 浙大统一认证用户名: ")
+    #     password = getpass.getpass('🔑 浙大统一认证密码: ')
+    #     print("⏲  请输入定时时间（默认每天6:05）")
+    #     hour = input("\thour: ") or 6
+    #     minute = input("\tminute: ") or 5
+
+    # # Schedule task
+    hour, minute = 0, 20
     scheduler = BlockingScheduler()
-    scheduler.add_job(main, 'cron', args=[username, password], hour=hour, minute=minute)
+    scheduler.add_job(multiUserDaKka, 'cron', args=[users.items()], hour=hour, minute=minute)
     print('⏰ 已启动定时程序，每天 %02d:%02d 为您打卡' %(int(hour), int(minute)))
     print('Press Ctrl+{0} to exit'.format('Break' if os.name == 'nt' else 'C'))
 
@@ -179,3 +188,6 @@ if __name__=="__main__":
         scheduler.start()
     except (KeyboardInterrupt, SystemExit):
         pass
+
+
+

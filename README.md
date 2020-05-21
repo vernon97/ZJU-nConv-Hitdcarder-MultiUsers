@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # ZJU-nCov-Hitcarder
 
 浙大nCov肺炎健康打卡定时自动脚本
@@ -71,3 +72,6 @@ Licensed under the [MIT License](https://github.com/Tishacy/ZJU-nCov-Hitcarder/b
 
 
 
+=======
+# ZJU-nConv-Hitdcarder-MultiUsers
+>>>>>>> 9f65c195115cfe9c42b7d071ece90940567107d9
