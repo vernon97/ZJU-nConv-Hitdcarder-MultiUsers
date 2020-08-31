@@ -1,6 +1,6 @@
 # ZJU-nCov-Hitcarder-MultiUsers
 
-修改自https://github.com/Tishacy/ZJU-nCov-Hitcarder, 实验室集体打卡用(逃
+Folk自https://github.com/Tishacy/ZJU-nCov-Hitcarder, 实验室集体打卡用(逃
 
 只需要新建 users.json文件, 保存所有打卡人的浙大通行证账号密码即可;
 
